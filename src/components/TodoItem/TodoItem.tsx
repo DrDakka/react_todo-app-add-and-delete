@@ -1,6 +1,7 @@
+/* eslint-disable no-console */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/control-has-associated-label */
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { EditableField, Todo } from '../../types/Todo';
 
 type Props = {
@@ -14,6 +15,7 @@ export const TodoItem: React.FC<Props> = ({ todo, loading, del, patch }) => {
   const { id, title, completed } = todo;
   const [editFlag, setEditFlag] = useState<boolean>(false);
   const [query, setQuery] = useState('');
+  const submitting = useRef(false);
 
   const handleDelete = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -24,9 +26,15 @@ export const TodoItem: React.FC<Props> = ({ todo, loading, del, patch }) => {
     await patch({ completed: !completed }, id);
   };
 
-  const handleSubmit = async () => {
-    if (query === '') {
-      del(id);
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (submitting.current) {
+      return;
+    }
+
+    submitting.current = true;
+    if (query.trim() === '') {
+      await del(id);
 
       return;
     }
@@ -39,14 +47,29 @@ export const TodoItem: React.FC<Props> = ({ todo, loading, del, patch }) => {
       return;
     }
 
-    await patch({ title: query }, id);
+    try {
+      await patch({ title: query.trim() }, id);
+      setEditFlag(false);
+      setQuery('');
+    } catch (e) {
+      throw e;
+    }
   };
 
   const onKeyUp = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    event.preventDefault();
     if (event.key === 'Escape') {
       setEditFlag(false);
       setQuery('');
     }
+  };
+
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    if (submitting.current) {
+      return;
+    }
+
+    handleSubmit(event);
   };
 
   return (
@@ -84,7 +107,7 @@ export const TodoItem: React.FC<Props> = ({ todo, loading, del, patch }) => {
           </button>
         </>
       ) : (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={(event: React.FormEvent) => handleSubmit(event)}>
           <input
             data-cy="TodoTitleField"
             type="text"
@@ -93,11 +116,7 @@ export const TodoItem: React.FC<Props> = ({ todo, loading, del, patch }) => {
             value={query}
             onChange={event => setQuery(event?.target.value)}
             onKeyUp={onKeyUp}
-            onBlur={() => {
-              handleSubmit();
-              setEditFlag(false);
-              setQuery('');
-            }}
+            onBlur={handleBlur}
             autoFocus
           />
         </form>

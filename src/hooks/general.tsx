@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
-import { Todo, EditableField } from '../types/Todo';
+import { EditableField, Todo } from '../types/Todo';
 import { method, USER_ID } from '../api/todos';
 
 export type Filter = 'all' | 'active' | 'completed';
@@ -104,8 +104,9 @@ export const useHooks = () => {
       setTodosFromServer(prev =>
         prev.map(todo => (todo.id === id ? { ...todo, ...data } : todo)),
       );
-    } catch {
+    } catch (e) {
       setError('Unable to update a todo');
+      throw e;
     } finally {
       setLoading(prev => prev.filter(ids => ids !== id));
     }

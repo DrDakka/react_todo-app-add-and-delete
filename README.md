@@ -13,6 +13,7 @@ and implement the ability to add and remove todos.
 ## Adding a todo
 
 Add a todo with the entered title on the form submit:
+gonna add a reame
 
 - text field should be focused by default;
 - if the title is empty show the `Title should not be empty` notification at the bottom;

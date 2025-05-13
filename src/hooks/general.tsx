@@ -2,17 +2,21 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import { EditableField, Todo } from '../types/Todo';
 import { method, USER_ID } from '../api/todos';
 
-export type Filter = 'all' | 'active' | 'completed';
+export enum Filter {
+  All = 'All',
+  Active = 'Active',
+  Completed = 'Completed',
+}
 
 export const useHooks = () => {
   const [todosFromServer, setTodosFromServer] = useState<Todo[]>([]);
   const [error, setError] = useState<string>('');
-  const [filter, setFilter] = useState<Filter>('all');
+  const [filter, setFilter] = useState<Filter>(Filter.All);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState<number[]>([]);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [query, setQuery] = useState<string>('');
-  const [tempTodo, setTempTodo] = useState<Todo | null>(null);
+  const [tempTodo, setTempTodo] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -31,13 +35,13 @@ export const useHooks = () => {
 
   const visibleTodos = useMemo(() => {
     switch (filter) {
-      case 'all':
+      case Filter.All:
         return todosFromServer;
 
-      case 'active':
+      case Filter.Active:
         return todosFromServer.filter((todo: Todo) => !todo.completed);
 
-      case 'completed':
+      case Filter.Completed:
         return todosFromServer.filter((todo: Todo) => todo.completed);
     }
   }, [todosFromServer, filter]);
@@ -67,7 +71,7 @@ export const useHooks = () => {
 
     const postPromise = method.post(newTodo);
 
-    setTempTodo({ ...newTodo, id: 0 });
+    setTempTodo(newTodo.title);
 
     try {
       const created = await postPromise;

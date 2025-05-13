@@ -1,5 +1,6 @@
 import { Filter } from '../../hooks/general';
 import { Todo } from '../../types/Todo';
+import classNames from 'classnames';
 
 type Props = {
   filter: string;
@@ -25,35 +26,21 @@ export const Footer: React.FC<Props> = ({
       </span>
 
       <nav className="filter" data-cy="Filter">
-        <a
-          href="#/"
-          onClick={() => setFilter('all')}
-          className={`filter__link${filter === 'all' ? ' selected' : ''}`}
-          data-cy="FilterLinkAll"
-        >
-          All
-        </a>
-
-        <a
-          href="#/active"
-          onClick={() => setFilter('active')}
-          className={`filter__link${filter === 'active' ? ' selected' : ''}`}
-          data-cy="FilterLinkActive"
-        >
-          Active
-        </a>
-
-        <a
-          href="#/completed"
-          onClick={() => setFilter('completed')}
-          className={`filter__link${filter === 'completed' ? ' selected' : ''}`}
-          data-cy="FilterLinkCompleted"
-        >
-          Completed
-        </a>
+        {Object.values(Filter).map(en => (
+          <a
+            key={en}
+            href={`#/${en.toLowerCase()}`}
+            onClick={() => setFilter(en)}
+            className={classNames('filter__link', {
+              selected: filter === en,
+            })}
+            data-cy={`FilterLink${en}`}
+          >
+            {en}
+          </a>
+        ))}
       </nav>
 
-      {/* this button should be disabled if there are no completed todos */}
       <button
         type="button"
         className="todoapp__clear-completed"

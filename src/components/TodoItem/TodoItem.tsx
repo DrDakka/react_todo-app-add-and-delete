@@ -3,6 +3,7 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import { useRef, useState } from 'react';
 import { EditableField, Todo } from '../../types/Todo';
+import classNames from 'classnames';
 
 type Props = {
   todo: Todo;
@@ -73,7 +74,10 @@ export const TodoItem: React.FC<Props> = ({ todo, loading, del, patch }) => {
   };
 
   return (
-    <div data-cy="Todo" className={`todo${completed ? ' completed' : ''}`}>
+    <div
+      data-cy="Todo"
+      className={classNames('todo', { completed: completed })}
+    >
       <label className="todo__status-label">
         <input
           data-cy="TodoStatus"
@@ -123,7 +127,7 @@ export const TodoItem: React.FC<Props> = ({ todo, loading, del, patch }) => {
       )}
       <div
         data-cy="TodoLoader"
-        className={`modal overlay${loading ? ' is-active' : ''}`}
+        className={classNames('modal overlay', { 'is-active': loading })}
       >
         <div className="modal-background has-background-white-ter" />
         <div className="loader" />
